@@ -7,7 +7,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("SECRET_KEY", default="dev-secret-change-in-prod")
 DEBUG = env("DEBUG", default=True)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = ['*']
 
 # MANDATORY — must exist before the very first migration
 AUTH_USER_MODEL = "accounts.User"
