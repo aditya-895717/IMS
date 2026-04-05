@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Stock Summary by Stage{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="stockTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Stage</th>
+                            <th>Model</th>
+                            <th>Quantity (Units)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in stage_counts %}
+                        <tr>
+                            <td><strong>{{ row.current_stage__stage_name }}</strong></td>
+                            <td>{{ row.model__model_name }}</td>
+                            <td>{{ row.count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No active routers in stock.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2" class="text-end">Total Active Stock:</th>
+                            <th id="totalStock">0</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        let total = 0;
+        $('#stockTable tbody tr').each(function() {
+            let val = parseInt($(this).find('td:eq(2)').text());
+            if(!isNaN(val)) total += val;
+        });
+        $('#totalStock').text(total);
+        
+        $('#stockTable').DataTable({
+            "order": [[0, "asc"]],
+            "paging": false,
+            "info": false
+        });
+    });
+</script>
+{% endblock %}

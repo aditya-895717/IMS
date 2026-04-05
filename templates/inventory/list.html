@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Inventory — Fortius IMS{% endblock %}
+{% block page_title %}Router Inventory{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold">Serial Number</label>
+                {{ search_form.serial }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Stage</label>
+                {{ search_form.stage }}
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Status</label>
+                {{ search_form.status }}
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search me-1"></i>Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card"><div class="card-body">
+    <table class="table table-hover data-table">
+        <thead><tr><th>Serial</th><th>MAC</th><th>Model</th><th>Stage</th><th>Status</th><th>Location</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for r in routers %}
+            <tr>
+                <td class="fw-semibold">{{ r.serial_number }}</td>
+                <td class="small">{{ r.mac_address }}</td>
+                <td>{{ r.model }}</td>
+                <td><span class="badge badge-stage bg-{% if r.current_stage.stage_code == 'READY' %}success{% elif r.current_stage.stage_code == 'REPAIR' %}warning{% elif r.current_stage.stage_code == 'SCRAP' %}danger{% else %}primary{% endif %}">{{ r.current_stage.stage_name }}</span></td>
+                <td><span class="badge bg-{% if r.current_status == 'active' %}success{% elif r.current_status == 'hold' %}warning{% elif r.current_status == 'scrap' %}danger{% else %}secondary{% endif %}">{{ r.get_current_status_display }}</span></td>
+                <td>{{ r.current_location|default:"—" }}</td>
+                <td><a href="{% url 'inventory:detail' r.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No routers found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Spare Parts — Fortius IMS{% endblock %}
+{% block page_title %}Spare Parts{% endblock %}
+{% block page_actions %}
+<a href="{% url 'masters:spare_part_add' %}" class="btn btn-sm btn-primary"><i class="fas fa-plus me-1"></i>Add Part</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <table class="table table-hover data-table">
+            <thead><tr><th>Code</th><th>Name</th><th>Stock</th><th>Min</th><th>Unit</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for p in parts %}
+                <tr>
+                    <td class="fw-semibold">{{ p.part_code }}</td>
+                    <td>{{ p.part_name }}</td>
+                    <td>{{ p.current_stock }}</td>
+                    <td>{{ p.min_stock }}</td>
+                    <td>{{ p.unit }}</td>
+                    <td>{{ p.location|default:"—" }}</td>
+                    <td>{% if p.is_low_stock %}<span class="badge bg-danger">Low</span>{% else %}<span class="badge bg-success">OK</span>{% endif %}</td>
+                    <td><a href="{% url 'masters:spare_part_edit' p.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No spare parts found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Testing — Fortius IMS{% endblock %}
+{% block page_title %}Testing{% endblock %}
+
+{% block content %}
+{% if pending_routers %}
+<div class="card mb-4">
+    <div class="card-header bg-white fw-semibold"><i class="fas fa-clock me-2 text-warning"></i>Pending Testing ({{ pending_routers|length }})</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Serial</th><th>Model</th><th>Stage</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for r in pending_routers %}
+                <tr>
+                    <td class="fw-semibold">{{ r.serial_number }}</td>
+                    <td>{{ r.model }}</td>
+                    <td><span class="badge bg-info">{{ r.current_stage.stage_name }}</span></td>
+                    <td><a href="{% url 'testing:create' r.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-play me-1"></i>Test</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header bg-white fw-semibold"><i class="fas fa-history me-2"></i>Test History</div>
+    <div class="card-body">
+        <table class="table table-hover data-table">
+            <thead><tr><th>Serial</th><th>Model</th><th>Tested By</th><th>Date</th><th>Retest</th><th>Result</th></tr></thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td class="fw-semibold">{{ r.router_unit.serial_number }}</td>
+                    <td>{{ r.router_unit.model }}</td>
+                    <td>{{ r.tested_by.get_full_name|default:r.tested_by.username }}</td>
+                    <td class="small">{{ r.tested_at|date:"d M Y H:i" }}</td>
+                    <td>{% if r.is_retest %}<span class="badge bg-warning">Retest</span>{% else %}—{% endif %}</td>
+                    <td><span class="badge bg-{% if r.overall_result == 'pass' %}success{% else %}danger{% endif %}">{{ r.overall_result|upper }}</span></td>
+                </tr>
+                {% empty %}<tr><td colspan="6" class="text-center text-muted py-4">No test records</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

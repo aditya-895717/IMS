@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Move Router Stage{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Scan or Enter Serial Number</label>
+                    <div class="input-group">
+                        <input type="text" id="serialInput" class="form-control" placeholder="e.g. AIR123456" autofocus>
+                        <button class="btn btn-primary" type="button" id="btnSearch">Lookup</button>
+                    </div>
+                </div>
+
+                <div id="routerDetails" class="d-none mt-4">
+                    <hr>
+                    <div class="mb-3">
+                        <p class="mb-1 text-muted small">Router Model</p>
+                        <h5 id="lblModel"></h5>
+                    </div>
+                    <div class="mb-3">
+                        <p class="mb-1 text-muted small">Current Stage</p>
+                        <span class="badge bg-secondary fs-6" id="lblStage"></span>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3">Allowed Next Stages:</h6>
+                        <div id="actionButtons" class="d-flex flex-wrap gap-2">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="errorAlert" class="alert alert-danger d-none mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('btnSearch').addEventListener('click', lookupRouter);
+    document.getElementById('serialInput').addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') lookupRouter();
+    });
+
+    function lookupRouter() {
+        const serial = document.getElementById('serialInput').value.trim();
+        if(!serial) return;
+
+        const detailsDiv = document.getElementById('routerDetails');
+        const errorAlert = document.getElementById('errorAlert');
+        const actionButtons = document.getElementById('actionButtons');
+        
+        detailsDiv.classList.add('d-none');
+        errorAlert.classList.add('d-none');
+        actionButtons.innerHTML = '';
+
+        fetch(`/api/router-details/?serial=${encodeURIComponent(serial)}`, {
+            headers: {'Accept': 'application/json'}
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                errorAlert.textContent = data.error;
+                errorAlert.classList.remove('d-none');
+            } else {
+                document.getElementById('lblModel').textContent = data.model;
+                document.getElementById('lblStage').textContent = data.current_stage;
+                
+                if (data.allowed_next.length === 0) {
+                    actionButtons.innerHTML = '<div class="alert alert-warning w-100">No applicable transitions.</div>';
+                } else {
+                    data.allowed_next.forEach(stage => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-outline-primary';
+                        btn.textContent = `Move to ${stage.name}`;
+                        btn.onclick = () => moveStage(serial, stage.code);
+                        actionButtons.appendChild(btn);
+                    });
+                }
+                detailsDiv.classList.remove('d-none');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            errorAlert.textContent = 'Server error occurred.';
+            errorAlert.classList.remove('d-none');
+        });
+    }
+
+    function moveStage(serial, toStageCode) {
+        if(!confirm(`Are you sure you want to move this router to ${toStageCode}?`)) return;
+
+        fetch('{% url "refurbishment:manual_move" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                serial: serial,
+                to_stage: toStageCode
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if(data.success) {
+                alert('Moved successfully');
+                lookupRouter(); // refresh data
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Server error occurred.');
+        });
+    }
+</script>
+{% endblock %}

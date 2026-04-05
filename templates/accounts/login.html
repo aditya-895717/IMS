@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Login — Fortius IMS{% endblock %}
+{% block page_header %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height:80vh">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0" style="border-radius:16px">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#1a237e,#3949ab);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px">
+                        <i class="fas fa-wifi fa-2x text-white"></i>
+                    </div>
+                    <h4 class="fw-bold" style="color:#1a237e">Fortius IMS</h4>
+                    <p class="text-muted small">Airtel WiFi Router Refurbishment System</p>
+                </div>
+
+                {% if form.errors %}
+                <div class="alert alert-danger py-2">
+                    <i class="fas fa-exclamation-triangle me-1"></i>
+                    Invalid username or password.
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" name="username" class="form-control" placeholder="Enter username" required autofocus>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="background:linear-gradient(135deg,#1a237e,#3949ab);border:none;border-radius:10px">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </button>
+                </form>
+
+                <p class="text-center text-muted small mt-4 mb-0">
+                    Fortius Electronic Pvt Ltd &copy; 2026
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

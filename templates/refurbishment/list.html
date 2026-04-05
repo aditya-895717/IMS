@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Stage Movements — Fortius IMS{% endblock %}
+{% block page_title %}Stage Movements{% endblock %}
+
+{% block content %}
+<div class="card"><div class="card-body">
+    <table class="table table-hover data-table">
+        <thead><tr><th>Serial</th><th>From</th><th>To</th><th>By</th><th>When</th><th>Outcome</th></tr></thead>
+        <tbody>
+            {% for m in movements %}
+            <tr>
+                <td class="fw-semibold">{{ m.router_unit.serial_number }}</td>
+                <td>{{ m.from_stage|default:"—" }}</td>
+                <td><span class="badge bg-primary badge-stage">{{ m.to_stage }}</span></td>
+                <td>{{ m.moved_by.get_full_name|default:m.moved_by.username }}</td>
+                <td class="small">{{ m.moved_at|date:"d M Y H:i" }}</td>
+                <td>{% if m.outcome %}<span class="badge bg-{% if m.outcome == 'pass' %}success{% elif m.outcome == 'fail' %}danger{% else %}secondary{% endif %}">{{ m.outcome }}</span>{% else %}—{% endif %}</td>
+            </tr>
+            {% empty %}<tr><td colspan="6" class="text-center text-muted py-4">No movements recorded</td></tr>{% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% endblock %}

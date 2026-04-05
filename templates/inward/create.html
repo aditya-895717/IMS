@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}New Inward Entry — Fortius IMS{% endblock %}
+{% block page_title %}New Inward Entry{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header bg-white fw-semibold"><i class="fas fa-file-alt me-2"></i>GRN Details</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">{{ form.inward_date.label_tag }} {{ form.inward_date }}</div>
+                <div class="col-md-4">{{ form.source_name.label_tag }} {{ form.source_name }}</div>
+                <div class="col-md-4">{{ form.vehicle_no.label_tag }} {{ form.vehicle_no }}</div>
+                <div class="col-md-4">{{ form.challan_no.label_tag }} {{ form.challan_no }}</div>
+                <div class="col-md-4">{{ form.document.label_tag }} {{ form.document }}</div>
+                <div class="col-md-4">{{ form.remarks.label_tag }} {{ form.remarks }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-list me-2"></i>Items</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addItem"><i class="fas fa-plus me-1"></i>Add Row</button>
+        </div>
+        <div class="card-body">
+            {{ formset.management_form }}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="itemTable">
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th><th>MAC Address</th><th>Model</th>
+                            <th>Condition</th><th>Batch No</th><th>Remarks</th><th>Del</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in formset %}
+                        <tr class="item-row">
+                            <td>{{ f.serial_number }}{% if f.serial_number.errors %}<div class="text-danger small">{{ f.serial_number.errors.0 }}</div>{% endif %}</td>
+                            <td>{{ f.mac_address }}{% if f.mac_address.errors %}<div class="text-danger small">{{ f.mac_address.errors.0 }}</div>{% endif %}</td>
+                            <td>{{ f.model }}</td>
+                            <td>{{ f.initial_condition }}</td>
+                            <td>{{ f.batch_no }}</td>
+                            <td>{{ f.remarks }}</td>
+                            <td>{% if f.DELETE %}{{ f.DELETE }}{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if formset.non_form_errors %}
+            <div class="alert alert-danger mt-2">{{ formset.non_form_errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save me-2"></i>Save Inward Entry</button>
+    <a href="{% url 'inward:list' %}" class="btn btn-outline-secondary btn-lg ms-2">Cancel</a>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('addItem').addEventListener('click', () => {
+    const tbody = document.querySelector('#itemTable tbody');
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    const idx = parseInt(totalForms.value);
+    const firstRow = tbody.querySelector('.item-row');
+    if (!firstRow) return;
+    const newRow = firstRow.cloneNode(true);
+    newRow.querySelectorAll('input, select, textarea').forEach(el => {
+        el.name = el.name.replace(/form-\d+/g, `form-${idx}`);
+        el.id = el.id.replace(/form-\d+/g, `form-${idx}`);
+        if (el.type === 'checkbox') el.checked = false;
+        else el.value = '';
+    });
+    tbody.appendChild(newRow);
+    totalForms.value = idx + 1;
+});
+</script>
+{% endblock %}

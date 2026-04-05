@@ -1,0 +1,138 @@
+<nav class="sidebar" id="sidebarMenu">
+    <div class="pt-3">
+        {% if user.role == 'admin' or user.role == 'inventory_manager' or user.role == 'production_supervisor' or user.role == 'management' %}
+        <div class="sidebar-heading">Overview</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'inventory_manager' %}
+        <div class="sidebar-heading">Inward</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'inward:list' %}">
+                    <i class="fas fa-truck-loading"></i> GRN List
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'inward:create' %}">
+                    <i class="fas fa-plus-circle"></i> New Inward
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'inventory_manager' or user.role == 'production_supervisor' or user.role == 'management' %}
+        <div class="sidebar-heading">Inventory</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'inventory:list' %}">
+                    <i class="fas fa-boxes-stacked"></i> All Routers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'refurbishment:list' %}">
+                    <i class="fas fa-route"></i> Stage Movements
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'testing_operator' %}
+        <div class="sidebar-heading">Testing</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'testing:list' %}">
+                    <i class="fas fa-vial"></i> Test Records
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'repair_technician' %}
+        <div class="sidebar-heading">Repair</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'repair:list' %}">
+                    <i class="fas fa-screwdriver-wrench"></i> Repair Records
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'qc_inspector' %}
+        <div class="sidebar-heading">Quality</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'qc:list' %}">
+                    <i class="fas fa-clipboard-check"></i> QC Records
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'dispatch_executive' %}
+        <div class="sidebar-heading">Dispatch</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'packing:list' %}">
+                    <i class="fas fa-box"></i> Packing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'dispatch:list' %}">
+                    <i class="fas fa-truck"></i> Dispatches
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'inventory_manager' %}
+        <div class="sidebar-heading">Masters</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'masters:router_model_list' %}">
+                    <i class="fas fa-microchip"></i> Router Models
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'masters:spare_part_list' %}">
+                    <i class="fas fa-cogs"></i> Spare Parts
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'masters:location_list' %}">
+                    <i class="fas fa-map-marker-alt"></i> Locations
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' or user.role == 'inventory_manager' or user.role == 'production_supervisor' or user.role == 'dispatch_executive' or user.role == 'management' %}
+        <div class="sidebar-heading">Reports</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'reports:stock_report' %}">
+                    <i class="fas fa-chart-bar"></i> Stock Report
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% if user.role == 'admin' %}
+        <div class="sidebar-heading">System</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/">
+                    <i class="fas fa-shield-halved"></i> Django Admin
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+</nav>

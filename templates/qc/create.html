@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}QC Inspect — Fortius IMS{% endblock %}
+{% block page_title %}QC Inspect: {{ router.serial_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-microchip me-2 text-primary"></i>Router Info</h6>
+            <table class="table table-sm">
+                <tr><th>Serial</th><td>{{ router.serial_number }}</td></tr>
+                <tr><th>MAC</th><td>{{ router.mac_address }}</td></tr>
+                <tr><th>Model</th><td>{{ router.model }}</td></tr>
+                <tr><th>Stage</th><td><span class="badge bg-info">{{ router.current_stage.stage_name }}</span></td></tr>
+            </table>
+        </div></div>
+    </div>
+    <div class="col-md-8">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-clipboard-check me-2 text-success"></i>QC Checklist</h6>
+            {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>{% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3 mb-3">
+                    {% for field in form %}
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                        <div class="col-md-4">
+                            <div class="form-check">{{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label></div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="row g-3">
+                    <div class="col-md-4"><label class="form-label fw-semibold">QC Result</label>{{ form.qc_result }}</div>
+                    <div class="col-md-8"><label class="form-label fw-semibold">Rejection Reason</label>{{ form.rejection_reason }}</div>
+                    <div class="col-12"><label class="form-label fw-semibold">Remarks</label>{{ form.remarks }}</div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save QC</button>
+                    <a href="{% url 'qc:list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                </div>
+            </form>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

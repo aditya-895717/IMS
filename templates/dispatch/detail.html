@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}{{ entry.dispatch_no }} — Fortius IMS{% endblock %}
+{% block page_title %}Dispatch: {{ entry.dispatch_no }}{% endblock %}
+{% block page_actions %}<a href="{% url 'dispatch:list' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back</a>{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-5">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3">Dispatch Details</h6>
+            <table class="table table-sm">
+                <tr><th>Dispatch No</th><td>{{ entry.dispatch_no }}</td></tr>
+                <tr><th>Date</th><td>{{ entry.dispatch_date|date:"d M Y" }}</td></tr>
+                <tr><th>Destination</th><td>{{ entry.destination }}</td></tr>
+                <tr><th>Transporter</th><td>{{ entry.transporter }}</td></tr>
+                <tr><th>Vehicle</th><td>{{ entry.vehicle_no|default:"—" }}</td></tr>
+                <tr><th>Challan</th><td>{{ entry.challan_no|default:"—" }}</td></tr>
+                <tr><th>Remarks</th><td>{{ entry.remarks|default:"—" }}</td></tr>
+                <tr><th>Created By</th><td>{{ entry.created_by }}</td></tr>
+            </table>
+        </div></div>
+    </div>
+    <div class="col-md-7">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3">Items ({{ entry.items.count }})</h6>
+            <table class="table table-sm table-hover">
+                <thead><tr><th>#</th><th>Serial</th><th>Model</th></tr></thead>
+                <tbody>
+                    {% for item in entry.items.all %}
+                    <tr><td>{{ forloop.counter }}</td><td class="fw-semibold">{{ item.router_unit.serial_number }}</td><td>{{ item.router_unit.model }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Repair — Fortius IMS{% endblock %}
+{% block page_title %}Repair{% endblock %}
+
+{% block content %}
+{% if pending_routers %}
+<div class="card mb-4">
+    <div class="card-header bg-white fw-semibold"><i class="fas fa-clock me-2 text-warning"></i>Pending Repair ({{ pending_routers|length }})</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Serial</th><th>Model</th><th>Stage</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for r in pending_routers %}
+                <tr>
+                    <td class="fw-semibold">{{ r.serial_number }}</td><td>{{ r.model }}</td>
+                    <td><span class="badge bg-warning">{{ r.current_stage.stage_name }}</span></td>
+                    <td><a href="{% url 'repair:create' r.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-wrench me-1"></i>Repair</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card"><div class="card-header bg-white fw-semibold"><i class="fas fa-history me-2"></i>Repair History</div>
+    <div class="card-body">
+        <table class="table table-hover data-table">
+            <thead><tr><th>Serial</th><th>Issue</th><th>Repaired By</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td class="fw-semibold">{{ r.router_unit.serial_number }}</td>
+                    <td>{{ r.issue_type }}</td>
+                    <td>{{ r.repaired_by.get_full_name|default:r.repaired_by.username }}</td>
+                    <td>{{ r.repair_date|date:"d M Y" }}</td>
+                    <td><span class="badge bg-{% if r.repair_status == 'completed' %}success{% elif r.repair_status == 'beyond_repair' %}danger{% else %}warning{% endif %}">{{ r.get_repair_status_display }}</span></td>
+                </tr>
+                {% empty %}<tr><td colspan="5" class="text-center text-muted py-4">No repair records</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

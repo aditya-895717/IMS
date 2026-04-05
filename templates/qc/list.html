@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}QC Inspection — Fortius IMS{% endblock %}
+{% block page_title %}QC Inspection{% endblock %}
+
+{% block content %}
+{% if pending_routers %}
+<div class="card mb-4">
+    <div class="card-header bg-white fw-semibold"><i class="fas fa-clock me-2 text-warning"></i>Pending QC ({{ pending_routers|length }})</div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Serial</th><th>Model</th><th>Stage</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for r in pending_routers %}
+                <tr>
+                    <td class="fw-semibold">{{ r.serial_number }}</td><td>{{ r.model }}</td>
+                    <td><span class="badge bg-teal-gradient text-white">{{ r.current_stage.stage_name }}</span></td>
+                    <td><a href="{% url 'qc:create' r.pk %}" class="btn btn-sm btn-success"><i class="fas fa-clipboard-check me-1"></i>Inspect</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card"><div class="card-header bg-white fw-semibold"><i class="fas fa-history me-2"></i>QC History</div>
+    <div class="card-body">
+        <table class="table table-hover data-table">
+            <thead><tr><th>Serial</th><th>Inspector</th><th>Date</th><th>Result</th></tr></thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td class="fw-semibold">{{ r.router_unit.serial_number }}</td>
+                    <td>{{ r.inspected_by.get_full_name|default:r.inspected_by.username }}</td>
+                    <td class="small">{{ r.inspected_at|date:"d M Y H:i" }}</td>
+                    <td><span class="badge bg-{% if r.qc_result == 'pass' %}success{% else %}danger{% endif %}">{{ r.qc_result|upper }}</span></td>
+                </tr>
+                {% empty %}<tr><td colspan="4" class="text-center text-muted py-4">No QC records</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

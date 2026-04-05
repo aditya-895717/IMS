@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Fortius IMS{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-primary-gradient">
+            <i class="fas fa-truck-loading stat-icon"></i>
+            <h3>{{ inward_today }}</h3>
+            <p>Inward Today</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-info-gradient">
+            <i class="fas fa-vial stat-icon"></i>
+            <h3>{{ in_testing }}</h3>
+            <p>In Testing</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-warning-gradient">
+            <i class="fas fa-screwdriver-wrench stat-icon"></i>
+            <h3>{{ in_repair }}</h3>
+            <p>In Repair</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-teal-gradient">
+            <i class="fas fa-clipboard-check stat-icon"></i>
+            <h3>{{ in_qc }}</h3>
+            <p>In QC</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-success-gradient">
+            <i class="fas fa-box-open stat-icon"></i>
+            <h3>{{ ready_stock }}</h3>
+            <p>Ready Stock</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-primary-gradient">
+            <i class="fas fa-truck stat-icon"></i>
+            <h3>{{ dispatched_today }}</h3>
+            <p>Dispatched Today</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card bg-danger-gradient">
+            <i class="fas fa-exclamation-triangle stat-icon"></i>
+            <h3>{{ low_spare_parts }}</h3>
+            <p>Low Stock Spares</p>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-3">
+        <div class="stat-card" style="background:linear-gradient(135deg,#4a148c,#7b1fa2)">
+            <i class="fas fa-microchip stat-icon"></i>
+            <h3>{{ total_active }}</h3>
+            <p>Total Active Units</p>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">
+                <i class="fas fa-chart-bar me-2 text-primary"></i>Units by Stage
+            </div>
+            <div class="card-body">
+                <canvas id="stageChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-white fw-semibold">
+                <i class="fas fa-chart-pie me-2 text-primary"></i>Stage Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="stagePie" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="card">
+    <div class="card-header bg-white fw-semibold">
+        <i class="fas fa-history me-2 text-primary"></i>Recent Activity
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr><th>Time</th><th>User</th><th>Module</th><th>Action</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                {% for log in recent_audit %}
+                <tr>
+                    <td class="small">{{ log.action_time|date:"d M H:i" }}</td>
+                    <td>{{ log.user|default:"System" }}</td>
+                    <td><span class="badge bg-secondary">{{ log.module_name }}</span></td>
+                    <td><span class="badge bg-{% if log.action == 'CREATE' %}success{% elif log.action == 'MOVE' %}primary{% elif log.action == 'UPDATE' %}warning{% else %}danger{% endif %}">{{ log.action }}</span></td>
+                    <td class="small">{{ log.description|truncatewords:15 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No activity yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const raw = {{ stage_chart_json|safe }};
+    const labels = Object.keys(raw);
+    const values = Object.values(raw);
+    const colors = ['#1a237e','#0277bd','#00695c','#ef6c00','#c62828',
+                    '#4a148c','#2e7d32','#ad1457','#37474f','#f57f17','#455a64','#880e4f'];
+
+    new Chart(document.getElementById('stageChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Router Units',
+                data: values,
+                backgroundColor: colors.slice(0, labels.length),
+                borderRadius: 6, barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+
+    new Chart(document.getElementById('stagePie'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+        }
+    });
+</script>
+{% endblock %}

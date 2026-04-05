@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Repair Router — Fortius IMS{% endblock %}
+{% block page_title %}Repair: {{ router.serial_number }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-microchip me-2 text-primary"></i>Router Info</h6>
+            <table class="table table-sm">
+                <tr><th>Serial</th><td>{{ router.serial_number }}</td></tr>
+                <tr><th>MAC</th><td>{{ router.mac_address }}</td></tr>
+                <tr><th>Model</th><td>{{ router.model }}</td></tr>
+                <tr><th>Stage</th><td><span class="badge bg-warning">{{ router.current_stage.stage_name }}</span></td></tr>
+            </table>
+        </div></div>
+    </div>
+    <div class="col-md-8">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-wrench me-2 text-warning"></i>Repair Details</h6>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <h6 class="fw-bold mt-4 mb-3"><i class="fas fa-cogs me-2"></i>Parts Used</h6>
+                {{ part_formset.management_form }}
+                <table class="table table-bordered">
+                    <thead><tr><th>Spare Part</th><th>Qty</th><th>Delete</th></tr></thead>
+                    <tbody>
+                        {% for pf in part_formset %}
+                        <tr>
+                            <td>{{ pf.spare_part }}</td>
+                            <td>{{ pf.qty_used }}</td>
+                            <td>{{ pf.DELETE }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Save Repair</button>
+                    <a href="{% url 'repair:list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                </div>
+            </form>
+        </div></div>
+    </div>
+</div>
+{% endblock %}

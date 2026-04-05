@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}{{ entry.inward_no }} — Fortius IMS{% endblock %}
+{% block page_title %}GRN: {{ entry.inward_no }}{% endblock %}
+{% block page_actions %}<a href="{% url 'inward:list' %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i>Back</a>{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3">Entry Details</h6>
+            <table class="table table-sm">
+                <tr><th width="40%">GRN No</th><td>{{ entry.inward_no }}</td></tr>
+                <tr><th>Date</th><td>{{ entry.inward_date|date:"d M Y" }}</td></tr>
+                <tr><th>Source</th><td>{{ entry.source_name }}</td></tr>
+                <tr><th>Vehicle</th><td>{{ entry.vehicle_no|default:"—" }}</td></tr>
+                <tr><th>Challan</th><td>{{ entry.challan_no|default:"—" }}</td></tr>
+                <tr><th>Remarks</th><td>{{ entry.remarks|default:"—" }}</td></tr>
+                <tr><th>Created By</th><td>{{ entry.created_by }}</td></tr>
+                <tr><th>Created At</th><td>{{ entry.created_at|date:"d M Y H:i" }}</td></tr>
+            </table>
+        </div></div>
+    </div>
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="fw-bold mb-3">Items ({{ entry.items.count }})</h6>
+            <table class="table table-sm table-hover">
+                <thead><tr><th>Serial</th><th>MAC</th><th>Model</th><th>Condition</th></tr></thead>
+                <tbody>
+                    {% for item in entry.items.all %}
+                    <tr>
+                        <td class="fw-semibold">{{ item.serial_number }}</td>
+                        <td>{{ item.mac_address }}</td>
+                        <td>{{ item.model }}</td>
+                        <td><span class="badge bg-{% if item.initial_condition == 'good' %}success{% elif item.initial_condition == 'damaged' %}danger{% else %}secondary{% endif %}">{{ item.get_initial_condition_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div></div>
+    </div>
+</div>
+{% endblock %}
